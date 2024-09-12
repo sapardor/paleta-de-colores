@@ -1,0 +1,55 @@
+#include <Esplora.h>
+
+// Variables para almacenar los valores RGB
+int redValue = 0;
+int greenValue = 0;
+int blueValue = 0;
+
+// Variable para controlar qué color está seleccionado
+char selectedColor = 'R'; // 'R' para rojo, 'G' para verde, 'B' para azul
+
+void setup() {
+  Esplora.writeRGB(0, 0, 0); // Inicia el LED RGB apagado
+}
+
+void loop() {
+  // Verificar qué botón se ha presionado para seleccionar el color
+  if (Esplora.readButton(SWITCH_1) == LOW) {
+    selectedColor = 'R'; // Botón A selecciona Rojo
+  } else if (Esplora.readButton(SWITCH_2) == LOW) {
+    selectedColor = 'G'; // Botón B selecciona Verde
+  } else if (Esplora.readButton(SWITCH_3) == LOW) {
+    selectedColor = 'B'; // Botón C selecciona Azul
+  }
+
+  // Leer la posición vertical del joystick
+  int joystickY = Esplora.readJoystickY(); 
+
+  // Ajustar el valor de brillo según el color seleccionado
+  if (selectedColor == 'R') {
+    redValue = adjustBrightness(redValue, joystickY);
+  } else if (selectedColor == 'G') {
+    greenValue = adjustBrightness(greenValue, joystickY);
+  } else if (selectedColor == 'B') {
+    blueValue = adjustBrightness(blueValue, joystickY);
+  }
+
+  // Actualizar el LED RGB con los nuevos valores
+  Esplora.writeRGB(redValue, greenValue, blueValue);
+
+  delay(50); // Pequeña pausa para suavizar la respuesta
+}
+
+// Función para ajustar el brillo basado en la posición del joystick
+int adjustBrightness(int colorValue, int joystickY) {
+  if (joystickY > 100) { // Mover el joystick hacia arriba
+    colorValue += 5; // Incrementar el valor de brillo
+  } else if (joystickY < -100) { // Mover el joystick hacia abajo
+    colorValue -= 5; // Disminuir el valor de brillo
+  }
+
+  // Asegurarse de que el valor de brillo esté dentro de los límites
+  colorValue = constrain(colorValue, 0, 255);
+  return colorValue;
+}
+ 
